@@ -13,7 +13,9 @@ from exercise.analytics import (
 from exercise.model import columns_types, index_columns
 from exercise.utils import create_index_statement, create_table_statement
 
-db_lock = multiprocessing.Lock()  # Lock to ensure only one process writes at a time
+db_lock = (
+    multiprocessing.Lock()
+)  # Lock to ensure only one process writes at a time. Not in use in this exercise. (See https://duckdb.org/docs/connect/concurrency.html#writing-to-duckdb-from-multiple-processes)
 
 
 class DBClient:

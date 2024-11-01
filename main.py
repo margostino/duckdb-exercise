@@ -30,9 +30,8 @@ def main(config):
         db.create_table()
         db.create_indexes()
         chunks = validate_and_prepare_data_chunks(chunk_size, csv_file_path)
-        db.backfill_data_by_chunks(chunks)
-
-    # db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name)
+        db.backfill_data_by_chunks(chunks)  # DuckDB support single-writer process only
+        # db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name) # Potential solution for multi-writer process using multiprocessing and retries due locking
 
     total_rows = db.sanity_select_count()
 
@@ -43,8 +42,8 @@ def main(config):
     else:
         print("Sanity check passed")
 
-    # results = db.calculate_analytics_parallel()
-    results = db.calculate_analytics()
+    results = db.calculate_analytics()  # Sequential execution
+    # results = db.calculate_analytics_parallel() # If needed, parallel execution, multiprocess in case of CPU bound (i.e. in-memory aggregations). If I/O bound, consider asyncio or threads
     if verbose:
         print_results(results)
 
