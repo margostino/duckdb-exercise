@@ -4,7 +4,8 @@ Considerations, Assumptions and Decisions:
 Configuration Management:
 	•	The configuration is managed through a config.toml file to centralize database paths, table names, chunk sizes, and sanity check expectations.
 Data Validation and Preparation:
-	•	Data is loaded in chunks using a chunk_size specified in the configuration. Each chunk undergoes validation to match a Pydantic schema.
+	•   Ran some initial data analysis to understand the data and its structure with a notebook.
+    •	Data is loaded in chunks using a chunk_size specified in the configuration. Each chunk undergoes validation to match a Pydantic schema.
 Database Operations:
 	•	In-memory DuckDB for testing.
     •	File DuckDB for main.
