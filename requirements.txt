@@ -1,0 +1,5 @@
+pytest
+duckdb
+pydantic
+pandas
+pyarrow
