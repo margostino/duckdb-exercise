@@ -48,14 +48,16 @@ class DBClient:
             f"Backfill duration {backfill_end_time - backfill_start_time:0.2f} seconds"
         )
 
-    def sanity_select(self):
+    def sanity_select_count(self):
         sanity_select_start_time = time.perf_counter()
         result = self.conn.execute(f"SELECT COUNT(*) FROM {self.table_name}").fetchall()
-        print(f"Sanity check count result: {result}")
         sanity_select_end_time = time.perf_counter()
         print(
             f"Sanity Select duration {sanity_select_end_time - sanity_select_start_time:0.2f} seconds"
         )
+        count = result[0][0] if result else 0
+        print(f"Sanity check count result: {count}")
+        return count
 
     def count_electric_cars_per_city(self):
         start_time = time.perf_counter()

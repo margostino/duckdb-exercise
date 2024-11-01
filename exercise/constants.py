@@ -12,3 +12,6 @@ QUERIES_MAP = {
     "find_most_popular_electric_vehicle_per_postal_code": "SELECT postal_code, vehicle_model, COUNT(*) as count FROM electric_vehicle_population GROUP BY postal_code, vehicle_model ORDER BY postal_code, count DESC",
     "count_electric_cars_by_model_year": "SELECT vehicle_model_year, COUNT(*) as count FROM electric_vehicle_population GROUP BY vehicle_model_year",
 }
+
+
+TOTAL_ROWS_SANITY_CHECK = 75215
