@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  duckdb:
+    image: qldrsc/duckdb
+    container_name: duckdb
+    volumes:
+      - ./data:/data
+    command: ["/bin/sh", "-c", "tail -f /dev/null"]
+    ports:
+      - "8765:8765"
+    networks:
+      - duckdb_network
+
+  test:
+    image: "exercise-8"
+    volumes:
+      - .:/app
+    command: python3 -m pytest
+
+  run:
+    image: "exercise-8"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+    command: python3 main.py
+
+volumes:
+  duckdb_data:
+
+networks:
+  duckdb_network:

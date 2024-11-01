@@ -1,0 +1,32 @@
+Considerations, Assumptions and Decisions:
+
+
+Configuration Management:
+	•	The configuration is managed through a config.toml file to centralize database paths, table names, chunk sizes, and sanity check expectations.
+Data Validation and Preparation:
+	•   Ran some initial data analysis to understand the data and its structure with a notebook.
+    •	Data is loaded in chunks using a chunk_size specified in the configuration. Each chunk undergoes validation to match a Pydantic schema.
+Database Operations:
+	•	In-memory DuckDB for testing.
+    •	File DuckDB for main.
+	•	Created some indexes on selected fields to optimize query performance for analytics.
+	•	Quantitive sanity check after data load.
+Data Ingestion Strategy:
+	•	Batch Ingestion: Data is ingested in batches for efficiency and maximazing DuckDB.
+    •	One process can both read and write to the database.
+    •   Since current analytic queries run fast, there is not neet to optimize (e.g. with multiprocess read-only). Although code is in place for future optimization.
+    •   Reload Option: The reload_enabled flag allows for reloading data from the CSV file. This is set by config.
+	•	Chunked and Multiprocessing Options: Supports both single-process chunked insertion and a multiprocessing option (backfill_data_by_chunks_multiprocess) to handle larger datasets or enhance speed on multi-core systems. This includes a lock and retry mechanism to handle DuckDB’s locking limitations.
+Analytics Processing:
+	•	calculate_analytics function executes and multiple queries sequentially. The alternative calculate_analytics_parallel option uses ProcessPoolExecutor for concurrent execution of analytics queries, which may reduce execution time on multi-core machines. For pure I/O bound and at scale this can be optimized with asyncio.
+	•	Analytics functions (e.g., count_electric_cars_per_city, find_top_3_most_popular_electric_vehicles) are defined independently and tested in unit tests, ensuring that individual analytics logic can be easily maintained and validated.
+File Management:
+	•	Old parquet files are deleted at the start of the script (delete_parquet_files), preventing stale data from being reused in subsequent runs and maintaining the integrity of fresh data ingestion.
+	•	Each count_electric_cars_by_model_year run saves yearly data in separate Parquet files, making it easier to analyze trends or historical data by model year.
+Unit Testing and Mocking:
+	•	Tests use unittest.mock and pytest to mock DuckDB and validate analytics outputs. This isolates the logic of each function, ensuring consistent results even without accessing external data.
+	•	Mocks are used to simulate data inputs and expected outputs for unit testing, covering cases such as top vehicle models, city-based car counts, and model year distributions.
+Error Handling and Retry Logic:
+	•	Although not in use, for database locking issues encountered during multiprocessing, retry logic is incorporated with a maximum retry limit and delay (insert_chunk), ensuring that transient errors do not terminate the process prematurely.
+Performance Monitoring:
+	•	All major database operations and analytics functions include time.perf_counter() calls to log execution duration, enabling performance monitoring and optimizations if needed.
