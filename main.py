@@ -17,6 +17,7 @@ def main(config):
     csv_file_path = config["ingestion"]["csv_file_path"]
     data_base_path = config["database"]["data_base_path"]
     reload_enabled = config["ingestion"]["reload_enabled"]
+    verbose = config["analytics"]["verbose"]
 
     queries = load_queries(queries_path)
 
@@ -44,7 +45,8 @@ def main(config):
 
     # results = db.calculate_analytics_parallel()
     results = db.calculate_analytics()
-    # print_results(results)
+    if verbose:
+        print_results(results)
 
 
 if __name__ == "__main__":
