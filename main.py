@@ -32,6 +32,7 @@ def main(config):
         chunks = validate_and_prepare_data_chunks(chunk_size, csv_file_path)
         db.backfill_data_by_chunks(chunks)  # DuckDB support single-writer process only
         # db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name) # Potential solution for multi-writer process using multiprocessing and retries due locking
+        # await db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name) # Current insert is including some CPU bound (i.e. in memory transformation) which makes this operation not fully I/O (hence GIL bottleneck)
 
     total_rows = db.sanity_select_count()
 

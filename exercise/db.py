@@ -132,6 +132,36 @@ class DBClient:
             f"Backfill duration {backfill_end_time - backfill_start_time:0.2f} seconds"
         )
 
+    # async def insert_batch_async(self, batch):
+    #     """
+    #     Insert a batch asynchronously using asyncio's to_thread to run in the background.
+    #     """
+    #     insert_query = f"INSERT INTO {self.table_name} ({', '.join(self.columns_types.keys())}) VALUES ({', '.join(['?' for _ in self.columns_types.keys()])})"
+    #     await asyncio.to_thread(self.conn.executemany, insert_query, batch)
+    #     print(f"Inserted {len(batch)} rows asynchronously")
+
+    # async def backfill_data_by_chunks_async(
+    #     self, data_chunks, max_concurrent_tasks: int = 5
+    # ):
+    #     """
+    #     Insert data by chunks asynchronously, running up to max_concurrent_tasks in parallel.
+    #     """
+    #     backfill_start_time = time.perf_counter()
+
+    #     semaphore = asyncio.Semaphore(max_concurrent_tasks)
+
+    #     async def insert_with_semaphore(chunk):
+    #         async with semaphore:
+    #             await self.insert_batch_async(chunk)
+
+    #     tasks = [insert_with_semaphore(chunk) for chunk in data_chunks]
+    #     await asyncio.gather(*tasks)
+
+    #     backfill_end_time = time.perf_counter()
+    #     print(
+    #         f"Backfill duration {backfill_end_time - backfill_start_time:0.2f} seconds (async)"
+    #     )
+
     def sanity_select_count(self):
         sanity_select_start_time = time.perf_counter()
         result = self.conn.execute(f"SELECT COUNT(*) FROM {self.table_name}").fetchall()
