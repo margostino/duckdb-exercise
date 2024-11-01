@@ -25,3 +25,16 @@ def create_table_statement(columns_types, table_name):
         {columns}
     )
     """
+
+
+def create_index_statement(table_name, column_name):
+    return (
+        f"CREATE INDEX IF NOT EXISTS idx_{column_name} ON {table_name} ({column_name})"
+    )
+
+
+def print_results(results):
+    print("Results:")
+    for key, value in results.items():
+        print(f"\n{key}:")
+        print(value)

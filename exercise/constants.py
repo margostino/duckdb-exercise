@@ -4,7 +4,7 @@ DATA_BASE_PATH = "./data"
 DB_PATH_FILE = f"{DATA_BASE_PATH}/electric_vehicle.duckdb"
 DB_PATH_IN_MEMORY = ":memory:"
 DB_PATH = DB_PATH_FILE
-BATCH_SIZE = 30000
+CHUCK_SIZE = 30000
 
 QUERIES_MAP = {
     "count_electric_cars_per_city": "SELECT city, COUNT(*) as count FROM electric_vehicle_population GROUP BY city",

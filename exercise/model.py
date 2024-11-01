@@ -11,22 +11,34 @@ class VehicleData(BaseModel):
         None, json_schema_extra={"csv_column": "County", "sql_type": "TEXT"}
     )
     city: Optional[str] = Field(
-        None, json_schema_extra={"csv_column": "City", "sql_type": "TEXT"}
+        None,
+        json_schema_extra={"csv_column": "City", "sql_type": "TEXT", "index": True},
     )
     state: Optional[str] = Field(
         None, json_schema_extra={"csv_column": "State", "sql_type": "TEXT"}
     )
     postal_code: Optional[int] = Field(
-        None, json_schema_extra={"csv_column": "Postal Code", "sql_type": "INTEGER"}
+        None,
+        json_schema_extra={
+            "csv_column": "Postal Code",
+            "sql_type": "INTEGER",
+            "index": True,
+        },
     )
     vehicle_model_year: Optional[int] = Field(
-        None, json_schema_extra={"csv_column": "Model Year", "sql_type": "INTEGER"}
+        None,
+        json_schema_extra={
+            "csv_column": "Model Year",
+            "sql_type": "INTEGER",
+            "index": True,
+        },
     )
     make: Optional[str] = Field(
         None, json_schema_extra={"csv_column": "Make", "sql_type": "TEXT"}
     )
     vehicle_model: Optional[str] = Field(
-        None, json_schema_extra={"csv_column": "Model", "sql_type": "TEXT"}
+        None,
+        json_schema_extra={"csv_column": "Model", "sql_type": "TEXT", "index": True},
     )
     electric_vehicle_type: Optional[str] = Field(
         None,
@@ -79,3 +91,9 @@ columns_types = {
     field_name: field.json_schema_extra["sql_type"]
     for field_name, field in VehicleData.model_fields.items()
 }
+
+index_columns = [
+    field_name
+    for field_name, field in VehicleData.model_fields.items()
+    if field.json_schema_extra.get("index")
+]

@@ -3,8 +3,8 @@ import time
 import duckdb
 
 from exercise.constants import DB_PATH, QUERIES_MAP, TABLE_NAME
-from exercise.model import columns_types
-from exercise.utils import create_table_statement
+from exercise.model import columns_types, index_columns
+from exercise.utils import create_index_statement, create_table_statement
 
 
 class DBClient:
@@ -12,14 +12,21 @@ class DBClient:
         self.db_path = db_path
         self.table_name = TABLE_NAME
         self.columns_types = columns_types
-        self.conn = duckdb.connect(
-            database=self.db_path, read_only=False
-        )  # Single connection
+        self.conn = duckdb.connect(database=self.db_path, read_only=False)
 
     def __del__(self):
         if self.conn:
             self.conn.close()
             print("Database connection closed.")
+
+    def create_indexes(self):
+        create_index_start_time = time.perf_counter()
+        for index_column in index_columns:
+            self.conn.execute(create_index_statement(self.table_name, index_column))
+        create_index_end_time = time.perf_counter()
+        print(
+            f"Create indexes duration {create_index_end_time - create_index_start_time:0.2f} seconds"
+        )
 
     def create_table(self):
         create_table_start_time = time.perf_counter()
@@ -48,6 +55,20 @@ class DBClient:
             f"Backfill duration {backfill_end_time - backfill_start_time:0.2f} seconds"
         )
 
+    def backfill_data_by_chunks(self, data_chunks):
+        backfill_start_time = time.perf_counter()
+        insert_query = f"INSERT INTO {self.table_name} ({', '.join(self.columns_types.keys())}) VALUES ({', '.join(['?' for _ in self.columns_types.keys()])})"
+        batch_counter = 0
+        for batch in data_chunks:
+            batch_counter += 1
+            self.conn.executemany(insert_query, batch)
+            print(f"Inserted batch #{batch_counter} of {len(batch)} rows")
+
+        backfill_end_time = time.perf_counter()
+        print(
+            f"Backfill duration {backfill_end_time - backfill_start_time:0.2f} seconds"
+        )
+
     def sanity_select_count(self):
         sanity_select_start_time = time.perf_counter()
         result = self.conn.execute(f"SELECT COUNT(*) FROM {self.table_name}").fetchall()
@@ -64,7 +85,6 @@ class DBClient:
         result_df = self.conn.execute(
             QUERIES_MAP["count_electric_cars_per_city"]
         ).fetchdf()
-        print("Electric cars per city:\n", result_df)
         end_time = time.perf_counter()
         print(
             f"Count electric cars per city duration {end_time - start_time:0.2f} seconds"
@@ -77,7 +97,6 @@ class DBClient:
         result_df = self.conn.execute(
             QUERIES_MAP["find_top_3_most_popular_electric_vehicles"]
         ).fetchdf()
-        print("Top 3 most popular electric vehicles:\n", result_df)
         end_time = time.perf_counter()
         print(
             f"Top 3 most popular electric vehicles duration {end_time - start_time:0.2f} seconds"
@@ -90,10 +109,6 @@ class DBClient:
         result_df = self.conn.execute(
             QUERIES_MAP["find_most_popular_electric_vehicle_per_postal_code"]
         ).fetchdf()
-        print(
-            "Most popular electric vehicle per postal code:\n",
-            result_df,
-        )
         end_time = time.perf_counter()
         print(
             f"Most popular electric vehicle per postal code duration {end_time - start_time:0.2f} seconds"
@@ -109,7 +124,6 @@ class DBClient:
         for year in result_df["vehicle_model_year"].unique():
             year_data = result_df[result_df["vehicle_model_year"] == year]
             year_data.to_parquet(f"./data/electric_cars_by_model_year={year}.parquet")
-        print("Count electric cars by model year:\n", result_df)
         end_time = time.perf_counter()
         print(
             f"Count electric cars by model year duration {end_time - start_time:0.2f} seconds"
@@ -119,22 +133,12 @@ class DBClient:
 
     def calculate_analytics(self):
         analytics_start_time = time.perf_counter()
-        results = {}
-        # Count the number of electric cars per city.
-        results["count_electric_cars_per_city"] = self.count_electric_cars_per_city()
-        # Find the top 3 most popular electric vehicles.
-        results["find_top_3_most_popular_electric_vehicles"] = (
-            self.find_top_3_most_popular_electric_vehicles()
-        )
-        # Find the most popular electric vehicle in each postal code.
-        results["find_most_popular_electric_vehicle_per_postal_code"] = (
-            self.find_most_popular_electric_vehicle_per_postal_code()
-        )
-        # Count the number of electric cars by model year. Write out the answer as parquet files partitioned by year.
-        results["count_electric_cars_by_model_year"] = (
-            self.count_electric_cars_by_model_year()
-        )
-
+        results = {
+            "count_electric_cars_per_city": self.count_electric_cars_per_city(),
+            "find_top_3_most_popular_electric_vehicles": self.find_top_3_most_popular_electric_vehicles(),
+            "find_most_popular_electric_vehicle_per_postal_code": self.find_most_popular_electric_vehicle_per_postal_code(),
+            "count_electric_cars_by_model_year": self.count_electric_cars_by_model_year(),
+        }
         analytics_end_time = time.perf_counter()
         print(
             f"Analytics duration {analytics_end_time - analytics_start_time:0.2f} seconds"

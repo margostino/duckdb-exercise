@@ -2,8 +2,8 @@ import time
 
 from exercise.constants import TOTAL_ROWS_SANITY_CHECK
 from exercise.db import DBClient
-from exercise.transformation import validate_and_prepare_data
-from exercise.utils import delete_parquet_files
+from exercise.transformation import validate_and_prepare_data_chunks
+from exercise.utils import delete_parquet_files, print_results
 
 
 def main():
@@ -12,8 +12,9 @@ def main():
 
     db.drop_table()
     db.create_table()
-    rows_to_insert = validate_and_prepare_data()
-    db.backfill_data(rows_to_insert)
+    db.create_indexes()
+    chunks = validate_and_prepare_data_chunks()
+    db.backfill_data_by_chunks(chunks)
     total_rows = db.sanity_select_count()
 
     if total_rows != TOTAL_ROWS_SANITY_CHECK:
@@ -23,7 +24,8 @@ def main():
     else:
         print("Sanity check passed")
 
-    db.calculate_analytics()
+    results = db.calculate_analytics()
+    print_results(results)
 
 
 if __name__ == "__main__":
