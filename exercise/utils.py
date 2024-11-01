@@ -1,11 +1,11 @@
 import glob
 import os
 
-from exercise.constants import DATA_BASE_PATH
+import duckdb
 
 
-def delete_parquet_files():
-    parquet_files = glob.glob(os.path.join(DATA_BASE_PATH, "*.parquet"))
+def delete_parquet_files(data_base_path):
+    parquet_files = glob.glob(os.path.join(data_base_path, "*.parquet"))
 
     for file_path in parquet_files:
         try:
@@ -38,3 +38,26 @@ def print_results(results):
     for key, value in results.items():
         print(f"\n{key}:")
         print(value)
+
+
+def execute_query_for(db_path, query_name):
+    with duckdb.connect(database=db_path, read_only=True) as conn:
+        result_df = conn.execute(QUERIES_MAP[query_name]).fetchdf()
+    return result_df
+
+
+def load_queries(queries_path):
+    queries_map = {}
+
+    for filename in os.listdir(queries_path):
+        if filename.endswith(".sql"):
+            query_name = os.path.splitext(filename)[0]
+
+            with open(
+                os.path.join(queries_path, filename), "r", encoding="utf-8"
+            ) as file:
+                query = file.read().strip()
+
+            queries_map[query_name] = query
+
+    return queries_map

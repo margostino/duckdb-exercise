@@ -3,12 +3,14 @@ from unittest.mock import patch
 import pytest
 
 from exercise.db import DBClient
+from exercise.utils import load_queries
 from fixtures.mocks import prepare_data_mocks
 
 
 @pytest.fixture
 def mock_duckdb():
-    db = DBClient(":memory:")
+    queries = load_queries("./queries")
+    db = DBClient(":memory:", "electric_vehicle_population", queries)
     db.create_table()
     rows_to_insert = prepare_data_mocks()
     db.backfill_data(rows_to_insert)
