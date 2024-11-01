@@ -9,7 +9,7 @@ chunk_size = 30000
 [ingestion]
 csv_file_path = "data/Electric_Vehicle_Population_Data.csv"
 total_rows_sanity_check = 75215
-reload_enabled = false
+reload_enabled = true
 
 # Uncomment these lines if using the "light" version
 # csv_file_path = "data/Electric_Vehicle_Population_Data_light.csv"

@@ -220,7 +220,7 @@ class DBClient:
 
         with ProcessPoolExecutor() as executor:
             future_to_task_name = {
-                executor.submit(task, self.db_path): name
+                executor.submit(task, self.db_path, self.queries): name
                 for name, task in tasks.items()
             }
 

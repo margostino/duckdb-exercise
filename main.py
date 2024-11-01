@@ -44,7 +44,7 @@ def main(config):
 
     # results = db.calculate_analytics_parallel()
     results = db.calculate_analytics()
-    print_results(results)
+    # print_results(results)
 
 
 if __name__ == "__main__":

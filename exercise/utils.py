@@ -40,9 +40,9 @@ def print_results(results):
         print(value)
 
 
-def execute_query_for(db_path, query_name):
+def execute_query_for(db_path, query):
     with duckdb.connect(database=db_path, read_only=True) as conn:
-        result_df = conn.execute(QUERIES_MAP[query_name]).fetchdf()
+        result_df = conn.execute(query).fetchdf()
     return result_df
 
 

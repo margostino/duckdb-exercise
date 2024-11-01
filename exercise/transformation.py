@@ -31,7 +31,5 @@ def validate_and_prepare_data_chunks(chunk_size, csv_file_path):
             chunks.append(rows)
 
     end_time = time.perf_counter()
-    print(
-        f"Process CSV, validate and create data to insert duration {end_time - start_time:0.2f} seconds"
-    )
+    print(f"Data chunking duration {end_time - start_time:0.2f} seconds")
     return chunks

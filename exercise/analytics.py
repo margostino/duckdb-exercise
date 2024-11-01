@@ -1,8 +1,8 @@
 from exercise.utils import execute_query_for
 
 
-def count_electric_cars_per_city(db_path):
-    result_df = execute_query_for(db_path, "count_electric_cars_per_city")
+def count_electric_cars_per_city(db_path, queries):
+    result_df = execute_query_for(db_path, queries["count_electric_cars_per_city"])
     return dict(zip(result_df["city"], result_df["count"]))
 
 
