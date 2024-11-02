@@ -31,8 +31,10 @@ def main(config):
         db.create_indexes()
         chunks = validate_and_prepare_data_chunks(chunk_size, csv_file_path)
         db.backfill_data_by_chunks(chunks)  # DuckDB support single-writer process only
-        # db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name) # Potential solution for multi-writer process using multiprocessing and retries due locking
-        # await db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name) # Current insert is including some CPU bound (i.e. in memory transformation) which makes this operation not fully I/O bound (hence GIL bottleneck)
+        # Potential solution for multi-writer process using multiprocessing and retries due locking
+        # db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name)
+        # Current insert is including some CPU bound (i.e. in memory transformation) which makes this operation not fully I/O bound (hence GIL bottleneck)
+        # await db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name)
 
     total_rows = db.sanity_select_count()
 
@@ -43,8 +45,13 @@ def main(config):
     else:
         print("Sanity check passed")
 
-    results = db.calculate_analytics()  # Sequential execution
-    # results = db.calculate_analytics_parallel() # weather CPU or I/O bound depends on the data size and how complex the queries. If needed, parallel execution, multiprocess in case of CPU bound (i.e. in-memory aggregations). If I/O bound, consider asyncio or threads
+    # Sequential execution. Although DuckDB support multiple readers processes with read-only mode. But for this data size is not needed.
+    results = db.calculate_analytics()
+    # Wether CPU or I/O bound depends on the data size and how complex the queries.
+    # If needed, parallel execution, multiprocess in case of CPU bound (i.e. in-memory aggregations).
+    # If I/O bound, consider asyncio or threads
+    # results = db.calculate_analytics_parallel()
+
     if verbose:
         print_results(results)
 

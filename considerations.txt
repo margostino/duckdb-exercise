@@ -1,6 +1,21 @@
 Considerations, Assumptions and Decisions:
 
+Some numbers:
+Create table duration ~0.00 seconds
+Create indexes duration ~0.00 seconds
+Data chunking duration ~0.5 seconds
+Backfill (configurable chunk size of 30k) duration ~40 seconds
+Count electric cars per city duration ~0.01 seconds
+Top 3 most popular electric vehicles duration ~0.00 seconds
+Most popular electric vehicle per postal code duration ~0.01 seconds
+Count electric cars by model year duration ~0.07 seconds
+Analytics duration ~0.09 seconds
+Total duration ~42.13 seconds
 
+
+
+Typing:
+	•	For the sake of exercise I did not use typing for functions, and args, except for the Pydantic schema for the model.
 Configuration Management:
 	•	The configuration is managed through a config.toml file to centralize database paths, table names, chunk sizes, and sanity check expectations.
 Data Validation and Preparation:
@@ -12,6 +27,7 @@ Database Operations:
 	•	Created some indexes on selected fields to optimize query performance for analytics.
 	•	Quantitive sanity check after data load.
 Data Ingestion Strategy:
+	•	Chunks of 30000 rows are loaded into the database for efficiency. This chunk size can be adjusted in the configuration file.
 	•	Batch Ingestion: Data is ingested in batches for efficiency and maximazing DuckDB.
     •	One process can both read and write to the database.
     •   Since current analytic queries run fast, there is not neet to optimize (e.g. with multiprocess read-only). Although code is in place for future optimization.
