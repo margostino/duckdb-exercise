@@ -8,6 +8,8 @@ from exercise.transformation import validate_and_prepare_data_chunks
 from exercise.utils import delete_parquet_files, load_queries, print_results
 
 
+# See notes witu assumptions, considerations and potential improvements here:
+# https://github.com/margostino/duckdb-exercise/blob/master/notes.txt
 def main(config):
     total_rows_sanity_check = config["ingestion"]["total_rows_sanity_check"]
     queries_path = config["analytics"]["queries_path"]
@@ -31,7 +33,7 @@ def main(config):
         db.create_indexes()
         chunks = validate_and_prepare_data_chunks(chunk_size, csv_file_path)
         db.backfill_data_by_chunks(chunks)  # DuckDB supports single-writer process only
-        # Potential solution for multi-writer process using multiprocessing and retries due locking
+        # Potential solution for multi-writer process using multiprocessing and retries due locking but still one writer at a time
         # db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name)
         # Current insert is including some CPU bound (i.e. in memory transformation) which makes this operation not fully I/O bound (hence GIL bottleneck)
         # await db.backfill_data_by_chunks_multiprocess(chunks, db_path, table_name)
