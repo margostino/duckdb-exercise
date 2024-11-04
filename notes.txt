@@ -46,3 +46,5 @@ Error Handling and Retry Logic:
 	•	Although not in use, for database locking issues encountered during multiprocessing, retry logic is incorporated with a maximum retry limit and delay (insert_chunk), ensuring that transient errors do not terminate the process prematurely.
 Performance Monitoring:
 	•	All major database operations and analytics functions include time.perf_counter() calls to log execution duration, enabling performance monitoring and optimizations if needed.
+Testing:
+	•	Not exaustive, but some tests are in place to validate the main analytics functions.
