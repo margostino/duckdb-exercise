@@ -239,6 +239,9 @@ class DBClient:
 
         return results
 
+    # Wether CPU or I/O bound depends on the data size and how complex the queries.
+    # If needed, parallel execution, multiprocess in case of CPU bound (i.e. in-memory aggregations).
+    # If I/O bound, consider asyncio or threads
     def calculate_analytics_parallel(self):
         self.close_connection()
         analytics_start_time = time.perf_counter()
